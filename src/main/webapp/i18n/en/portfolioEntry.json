@@ -1,0 +1,35 @@
+{
+  "acepApp": {
+    "portfolioEntry": {
+      "home": {
+        "title": "Portfolio Entries",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Portfolio Entry",
+        "createOrEditLabel": "Create or edit a Portfolio Entry",
+        "search": "Search for Portfolio Entry",
+        "notFound": "No Portfolio Entries found"
+      },
+      "created": "A new Portfolio Entry is created with identifier {{ param }}",
+      "updated": "A Portfolio Entry is updated with identifier {{ param }}",
+      "deleted": "A Portfolio Entry is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Portfolio Entry {{ id }}?"
+      },
+      "detail": {
+        "title": "Portfolio Entry"
+      },
+      "id": "ID",
+      "amount": "Amount",
+      "price": "Price",
+      "bought": "Bought",
+      "sold": "Sold",
+      "customName": "Custom Name",
+      "group1": "Group 1",
+      "group2": "Group 2",
+      "group3": "Group 3",
+      "group4": "Group 4",
+      "portfolio": "Portfolio",
+      "asset": "Asset"
+    }
+  }
+}

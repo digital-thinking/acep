@@ -1,0 +1,35 @@
+{
+  "acepApp": {
+    "portfolioEntry": {
+      "home": {
+        "title": "Portfolio Entries",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Portfolio Entry erstellen",
+        "createOrEditLabel": "Portfolio Entry erstellen oder bearbeiten",
+        "search": "Suche nach Portfolio Entry",
+        "notFound": "No Portfolio Entries found"
+      },
+      "created": "Portfolio Entry erstellt mit ID {{ param }}",
+      "updated": "Portfolio Entry aktualisiert mit ID {{ param }}",
+      "deleted": "Portfolio Entry gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Portfolio Entry {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Portfolio Entry"
+      },
+      "id": "ID",
+      "amount": "Amount",
+      "price": "Price",
+      "bought": "Bought",
+      "sold": "Sold",
+      "customName": "Custom Name",
+      "group1": "Group 1",
+      "group2": "Group 2",
+      "group3": "Group 3",
+      "group4": "Group 4",
+      "portfolio": "Portfolio",
+      "asset": "Asset"
+    }
+  }
+}

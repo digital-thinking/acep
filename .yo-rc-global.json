@@ -1,0 +1,8 @@
+{
+  "generator-jhipster:7.0.0-beta.0": {
+    "promptValues": {
+      "packageName": "de.ixeption.acep",
+      "nativeLanguage": "de"
+    }
+  }
+}

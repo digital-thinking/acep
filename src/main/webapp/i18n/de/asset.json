@@ -1,0 +1,30 @@
+{
+  "acepApp": {
+    "asset": {
+      "home": {
+        "title": "Assets",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Asset erstellen",
+        "createOrEditLabel": "Asset erstellen oder bearbeiten",
+        "search": "Suche nach Asset",
+        "notFound": "No Assets found"
+      },
+      "created": "Asset erstellt mit ID {{ param }}",
+      "updated": "Asset aktualisiert mit ID {{ param }}",
+      "deleted": "Asset gelöscht mit ID {{ param }}",
+      "delete": {
+        "question": "Soll Asset {{ id }} wirklich dauerhaft gelöscht werden?"
+      },
+      "detail": {
+        "title": "Asset"
+      },
+      "id": "ID",
+      "name": "Name",
+      "currency": "Currency",
+      "assetType": "Asset Type",
+      "symbol": "Symbol",
+      "source": "Source",
+      "portfolioEntry": "Portfolio Entry"
+    }
+  }
+}

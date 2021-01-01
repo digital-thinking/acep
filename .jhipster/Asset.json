@@ -1,0 +1,61 @@
+{
+  "name": "Asset",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": [
+        "required"
+      ]
+    },
+    {
+      "fieldName": "currency",
+      "fieldType": "Currency",
+      "fieldValues": "AED,USD",
+      "fieldValidateRules": [
+        "required"
+      ]
+    },
+    {
+      "fieldName": "assetType",
+      "fieldType": "AssetType",
+      "fieldValues": "Stock,Forex,Crypto,Custom",
+      "fieldValidateRules": [
+        "required"
+      ]
+    },
+    {
+      "fieldName": "symbol",
+      "fieldType": "String",
+      "fieldValidateRules": [
+        "required"
+      ]
+    },
+    {
+      "fieldName": "source",
+      "fieldType": "Source",
+      "fieldValues": "AlphaVantage,Binance",
+      "fieldValidateRules": [
+        "required"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "portfolioEntry",
+      "otherEntityRelationshipName": "asset",
+      "relationshipName": "portfolioEntry"
+    }
+  ],
+  "entityTableName": "asset",
+  "dto": "no",
+  "pagination": "no",
+  "service": "no",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "changelogDate": "20201231235452"
+}

@@ -1,0 +1,9 @@
+{
+  "acepApp": {
+    "Source": {
+      "null": "",
+      "AlphaVantage": "AlphaVantage",
+      "Binance": "Binance"
+    }
+  }
+}

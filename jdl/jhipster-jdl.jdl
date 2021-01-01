@@ -1,0 +1,52 @@
+
+
+enum AssetType {
+  Stock,
+  Forex,
+  Crypto,
+  Custom
+}
+
+enum Source {
+  AlphaVantage,
+  Binance
+}
+
+enum Currency {
+    AED, USD
+}
+
+entity Portfolio {
+	name String required minlength(1) maxlength(255)
+    created Instant
+}
+
+entity PortfolioEntry {
+    amount Long required
+    price BigDecimal required
+    bought Instant required
+    sold Instant
+    customName String
+    group1 String
+    group2 String
+    group3 String
+    group4 String
+}
+
+entity Asset {
+	name String required
+	currency Currency required
+    assetType AssetType required
+    symbol String required
+    source Source required
+}
+
+relationship OneToMany {
+  Portfolio to PortfolioEntry
+}
+
+relationship OneToMany {
+	Asset to PortfolioEntry
+}
+
+
