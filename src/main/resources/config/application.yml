@@ -169,4 +169,5 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  alphaVantageApiKey: 'VQLAJ7OFO51RKHRL'

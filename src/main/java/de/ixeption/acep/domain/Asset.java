@@ -19,7 +19,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "asset")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "asset")
 public class Asset implements Serializable {
 
@@ -38,13 +38,11 @@ public class Asset implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "currency", nullable = false)
-    @Field(index = false, docValues = false)
     private Currency currency;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "asset_type", nullable = false)
-    @Field(index = false, docValues = false)
     private AssetType assetType;
 
     @NotNull
@@ -54,7 +52,6 @@ public class Asset implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "source", nullable = false)
-    @Field(index = false, docValues = false)
     private Source source;
 
     @OneToMany(mappedBy = "asset")
@@ -63,7 +60,6 @@ public class Asset implements Serializable {
         "portfolio",
         "asset",
     }, allowSetters = true)
-    @Field(index = false, docValues = false)
     private Set<PortfolioEntry> portfolioEntries = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

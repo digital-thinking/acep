@@ -49,6 +49,7 @@ public class CacheConfiguration {
         return cm -> {
             createCache(cm, de.ixeption.acep.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, de.ixeption.acep.repository.UserRepository.USERS_BY_EMAIL_CACHE);
+            createCache(cm, de.ixeption.acep.repository.AssetRepository.ASSETS_BY_SOURCE_AND_SYMBOL);
             createCache(cm, de.ixeption.acep.domain.User.class.getName());
             createCache(cm, de.ixeption.acep.domain.Authority.class.getName());
             createCache(cm, de.ixeption.acep.domain.User.class.getName() + ".authorities");

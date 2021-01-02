@@ -267,6 +267,7 @@ dependencies {
     testImplementation "com.h2database:h2"
     liquibaseRuntime "com.h2database:h2"
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
 
 if (project.hasProperty("gae")) {
