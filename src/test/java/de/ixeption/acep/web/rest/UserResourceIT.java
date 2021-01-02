@@ -38,11 +38,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link UserResource} REST controller.
  */
 @AutoConfigureMockMvc
-@WithMockUser(authorities = Role.ROLE_ADMIN.name())
+@WithMockUser(authorities = "ROLE_ADMIN")
 @IntegrationTest
 class UserResourceIT {
 
-    private static final String DEFAULT_LOGIN = "johndoe";
+    public static final String DEFAULT_LOGIN = "johndoe";
     private static final String UPDATED_LOGIN = "jhipster";
 
     private static final Long DEFAULT_ID = 1L;

@@ -56,6 +56,10 @@ public class PortfolioEntryResource extends AbstractResource {
     public ResponseEntity<PortfolioEntry> createPortfolioEntry(@Valid @RequestBody PortfolioEntry portfolioEntry) throws URISyntaxException {
         log.debug("REST request to save PortfolioEntry : {}", portfolioEntry);
 
+        if (portfolioEntry.getId() != null) {
+            throw new BadRequestAlertException("A new entity cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+
         User loggedInUser = getLoggedInUser();
         if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
             PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
@@ -81,6 +85,9 @@ public class PortfolioEntryResource extends AbstractResource {
     @PutMapping("/portfolio-entries")
     public ResponseEntity<PortfolioEntry> updatePortfolioEntry(@Valid @RequestBody PortfolioEntry portfolioEntry) throws URISyntaxException {
         log.debug("REST request to update PortfolioEntry : {}", portfolioEntry);
+        if (portfolioEntry.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
         User loggedInUser = getLoggedInUser();
         if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
             PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
@@ -108,63 +115,68 @@ public class PortfolioEntryResource extends AbstractResource {
     public ResponseEntity<PortfolioEntry> partialUpdatePortfolioEntry(@NotNull @RequestBody PortfolioEntry portfolioEntry) throws URISyntaxException {
         log.debug("REST request to update PortfolioEntry partially : {}", portfolioEntry);
         User loggedInUser = getLoggedInUser();
-        if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
-            Optional<PortfolioEntry> result = portfolioEntryRepository.findById(portfolioEntry.getId())
-                .map(existingPortfolioEntry -> {
-                    if (portfolioEntry.getAmount() != null) {
-                        existingPortfolioEntry.setAmount(portfolioEntry.getAmount());
-                    }
+        if (portfolioEntry.getId() != null) {
+            Optional<PortfolioEntry> existingPortfolioEntryOptional = portfolioEntryRepository.findById(portfolioEntry.getId());
 
-                    if (portfolioEntry.getPrice() != null) {
-                        existingPortfolioEntry.setPrice(portfolioEntry.getPrice());
-                    }
+            if (existingPortfolioEntryOptional.isPresent()) {
+                PortfolioEntry existingPortfolioEntry = existingPortfolioEntryOptional.get();
+                if (existingPortfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
+                    updateEntity(portfolioEntry, existingPortfolioEntry);
+                    PortfolioEntry saved = portfolioEntryRepository.save(existingPortfolioEntry);
+                    PortfolioEntry ignored = portfolioEntrySearchRepository.save(saved);
+                    return ResponseUtil.wrapOrNotFound(
+                        Optional.of(saved),
+                        HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString())
+                    );
+                }
 
-                    if (portfolioEntry.getBought() != null) {
-                        existingPortfolioEntry.setBought(portfolioEntry.getBought());
-                    }
-
-                    if (portfolioEntry.getSold() != null) {
-                        existingPortfolioEntry.setSold(portfolioEntry.getSold());
-                    }
-
-                    if (portfolioEntry.getCustomName() != null) {
-                        existingPortfolioEntry.setCustomName(portfolioEntry.getCustomName());
-                    }
-
-                    if (portfolioEntry.getGroup1() != null) {
-                        existingPortfolioEntry.setGroup1(portfolioEntry.getGroup1());
-                    }
-
-                    if (portfolioEntry.getGroup2() != null) {
-                        existingPortfolioEntry.setGroup2(portfolioEntry.getGroup2());
-                    }
-
-                    if (portfolioEntry.getGroup3() != null) {
-                        existingPortfolioEntry.setGroup3(portfolioEntry.getGroup3());
-                    }
-
-                    if (portfolioEntry.getGroup4() != null) {
-                        existingPortfolioEntry.setGroup4(portfolioEntry.getGroup4());
-                    }
-
-
-                    return existingPortfolioEntry;
-                })
-                .map(portfolioEntryRepository::save)
-                .map(savedPortfolioEntry -> {
-                    portfolioEntrySearchRepository.save(savedPortfolioEntry);
-
-                    return savedPortfolioEntry;
-
-                });
-
-            return ResponseUtil.wrapOrNotFound(
-                result,
-                HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString())
-            );
+            }
         }
         throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
 
+
+    }
+
+    private void updateEntity(PortfolioEntry portfolioEntry, PortfolioEntry existingPortfolioEntry) {
+        if (portfolioEntry.getAmount() != null) {
+            existingPortfolioEntry.setAmount(portfolioEntry.getAmount());
+        }
+
+        if (portfolioEntry.getPrice() != null) {
+            existingPortfolioEntry.setPrice(portfolioEntry.getPrice());
+        }
+
+        if (portfolioEntry.getBought() != null) {
+            existingPortfolioEntry.setBought(portfolioEntry.getBought());
+        }
+
+        if (portfolioEntry.getSold() != null) {
+            existingPortfolioEntry.setSold(portfolioEntry.getSold());
+        }
+
+        if (portfolioEntry.getCustomName() != null) {
+            existingPortfolioEntry.setCustomName(portfolioEntry.getCustomName());
+        }
+
+        if (portfolioEntry.getGroup1() != null) {
+            existingPortfolioEntry.setGroup1(portfolioEntry.getGroup1());
+        }
+
+        if (portfolioEntry.getGroup2() != null) {
+            existingPortfolioEntry.setGroup2(portfolioEntry.getGroup2());
+        }
+
+        if (portfolioEntry.getGroup3() != null) {
+            existingPortfolioEntry.setGroup3(portfolioEntry.getGroup3());
+        }
+
+        if (portfolioEntry.getGroup4() != null) {
+            existingPortfolioEntry.setGroup4(portfolioEntry.getGroup4());
+        }
+
+        if (portfolioEntry.getPortfolio() != null) {
+            existingPortfolioEntry.setPortfolio(portfolioEntry.getPortfolio());
+        }
     }
 
     /**
@@ -195,10 +207,13 @@ public class PortfolioEntryResource extends AbstractResource {
         log.debug("REST request to get PortfolioEntry : {}", id);
         Optional<PortfolioEntry> portfolioEntry = portfolioEntryRepository.findById(id);
         User loggedInUser = getLoggedInUser();
-        if (portfolioEntry.isPresent() && portfolioEntry.get().getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
-            return ResponseUtil.wrapOrNotFound(portfolioEntry);
+        boolean allowed = portfolioEntry.isPresent() && (
+            portfolioEntry.get().getPortfolio().getUser().equals(loggedInUser) || isAdminUser());
+        if (!allowed) {
+            portfolioEntry = Optional.empty();
         }
-        throw new BadRequestAlertException("not logged in", ENTITY_NAME, "messages.register.noaccount");
+        return ResponseUtil.wrapOrNotFound(portfolioEntry);
+
     }
 
     /**

@@ -80,13 +80,12 @@ class AssetResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Asset createEntity(EntityManager em) {
-        Asset asset = new Asset()
+        return new Asset()
             .name(DEFAULT_NAME)
             .currency(DEFAULT_CURRENCY)
             .assetType(DEFAULT_ASSET_TYPE)
             .symbol(DEFAULT_SYMBOL)
             .source(DEFAULT_SOURCE);
-        return asset;
     }
 
     /**
@@ -96,13 +95,12 @@ class AssetResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Asset createUpdatedEntity(EntityManager em) {
-        Asset asset = new Asset()
+        return new Asset()
             .name(UPDATED_NAME)
             .currency(UPDATED_CURRENCY)
             .assetType(UPDATED_ASSET_TYPE)
             .symbol(UPDATED_SYMBOL)
             .source(UPDATED_SOURCE);
-        return asset;
     }
 
     @BeforeEach
@@ -112,6 +110,7 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void createAsset() throws Exception {
         int databaseSizeBeforeCreate = assetRepository.findAll().size();
         // Create the Asset
@@ -136,6 +135,79 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_USER")
+    void forbiddenCreate() throws Exception {
+        int databaseSizeBeforeCreate = assetRepository.findAll().size();
+        // Create the Asset
+        restAssetMockMvc.perform(post("/api/assets").with(csrf())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(asset)))
+            .andExpect(status().isForbidden());
+
+        // Validate the Asset not in the database
+        List<Asset> assetList = assetRepository.findAll();
+        assertThat(assetList).hasSize(databaseSizeBeforeCreate);
+
+        // Validate the Asset not in Elasticsearch
+        verify(mockAssetSearchRepository, times(0)).save(createEntity(em));
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = "ROLE_USER")
+    void forbiddenUpdate() throws Exception {
+        // Initialize the database
+        assetRepository.saveAndFlush(asset);
+
+        int databaseSizeBeforeUpdate = assetRepository.findAll().size();
+
+        // Update the asset
+        Asset updatedAsset = assetRepository.findById(asset.getId()).get();
+        // Disconnect from session so that the updates on updatedAsset are not directly saved in db
+        em.detach(updatedAsset);
+        updatedAsset
+            .name(UPDATED_NAME)
+            .currency(UPDATED_CURRENCY)
+            .assetType(UPDATED_ASSET_TYPE)
+            .symbol(UPDATED_SYMBOL)
+            .source(UPDATED_SOURCE);
+
+        restAssetMockMvc.perform(put("/api/assets").with(csrf())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(updatedAsset)))
+            .andExpect(status().isForbidden());
+
+        // Validate the Asset in the database
+        List<Asset> assetList = assetRepository.findAll();
+        assertThat(assetList).hasSize(databaseSizeBeforeUpdate);
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = "ROLE_USER")
+    void forbiddenDelete() throws Exception {
+        // Initialize the database
+        assetRepository.saveAndFlush(asset);
+
+        int databaseSizeBeforeDelete = assetRepository.findAll().size();
+
+        // Delete the asset
+        restAssetMockMvc.perform(delete("/api/assets/{id}", asset.getId()).with(csrf())
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+
+        // Validate the database contains one less item
+        List<Asset> assetList = assetRepository.findAll();
+        assertThat(assetList).hasSize(databaseSizeBeforeDelete);
+
+        // Validate the Asset in Elasticsearch
+        verify(mockAssetSearchRepository, times(0)).deleteById(asset.getId());
+    }
+
+
+    @Test
+    @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void createAssetWithExistingId() throws Exception {
         // Create the Asset with an existing ID
         asset.setId(1L);
@@ -298,6 +370,7 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void updateAsset() throws Exception {
         // Initialize the database
         assetRepository.saveAndFlush(asset);
@@ -336,6 +409,7 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void updateNonExistingAsset() throws Exception {
         int databaseSizeBeforeUpdate = assetRepository.findAll().size();
 
@@ -356,6 +430,7 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void partialUpdateAssetWithPatch() throws Exception {
 
 // Initialize the database
@@ -389,6 +464,7 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void fullUpdateAssetWithPatch() throws Exception {
 
 // Initialize the database
@@ -425,6 +501,7 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void partialUpdateAssetShouldThrown() throws Exception {
         // Update the asset without id should throw
         Asset partialUpdatedAsset = new Asset();
@@ -437,6 +514,7 @@ class AssetResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void deleteAsset() throws Exception {
         // Initialize the database
         assetRepository.saveAndFlush(asset);

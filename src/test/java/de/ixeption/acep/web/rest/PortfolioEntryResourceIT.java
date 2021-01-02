@@ -1,15 +1,21 @@
 package de.ixeption.acep.web.rest;
 
 import de.ixeption.acep.IntegrationTest;
+import de.ixeption.acep.domain.Portfolio;
 import de.ixeption.acep.domain.PortfolioEntry;
+import de.ixeption.acep.domain.User;
 import de.ixeption.acep.repository.PortfolioEntryRepository;
+import de.ixeption.acep.repository.PortfolioRepository;
+import de.ixeption.acep.repository.UserRepository;
 import de.ixeption.acep.repository.search.PortfolioEntrySearchRepository;
+import de.ixeption.acep.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static de.ixeption.acep.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,10 +53,10 @@ class PortfolioEntryResourceIT {
     private static final BigDecimal DEFAULT_PRICE = new BigDecimal(1);
     private static final BigDecimal UPDATED_PRICE = new BigDecimal(2);
 
-    private static final LocalDateTime DEFAULT_BOUGHT = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
+    private static final LocalDateTime DEFAULT_BOUGHT = LocalDateTime.ofEpochSecond(100, 0, ZoneOffset.MIN);
     private static final LocalDateTime UPDATED_BOUGHT = LocalDateTime.now();
 
-    private static final LocalDateTime DEFAULT_SOLD = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
+    private static final LocalDateTime DEFAULT_SOLD = LocalDateTime.ofEpochSecond(100, 0, ZoneOffset.MIN);
     private static final LocalDateTime UPDATED_SOLD = LocalDateTime.now();
 
     private static final String DEFAULT_CUSTOM_NAME = "AAAAAAAAAA";
@@ -69,6 +76,8 @@ class PortfolioEntryResourceIT {
 
     @Autowired
     private PortfolioEntryRepository portfolioEntryRepository;
+    @MockBean
+    UserService userService;
 
     /**
      * This repository is mocked in the de.ixeption.acep.repository.search test package.
@@ -83,8 +92,14 @@ class PortfolioEntryResourceIT {
 
     @Autowired
     private MockMvc restPortfolioEntryMockMvc;
+    @Autowired
+    private PortfolioRepository portfolioRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     private PortfolioEntry portfolioEntry;
+    private Portfolio portfolio;
+
 
     /**
      * Create an entity for this test.
@@ -93,7 +108,7 @@ class PortfolioEntryResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static PortfolioEntry createEntity(EntityManager em) {
-        PortfolioEntry portfolioEntry = new PortfolioEntry()
+        return new PortfolioEntry()
             .amount(DEFAULT_AMOUNT)
             .price(DEFAULT_PRICE)
             .bought(DEFAULT_BOUGHT)
@@ -103,7 +118,6 @@ class PortfolioEntryResourceIT {
             .group2(DEFAULT_GROUP_2)
             .group3(DEFAULT_GROUP_3)
             .group4(DEFAULT_GROUP_4);
-        return portfolioEntry;
     }
 
     /**
@@ -113,7 +127,7 @@ class PortfolioEntryResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static PortfolioEntry createUpdatedEntity(EntityManager em) {
-        PortfolioEntry portfolioEntry = new PortfolioEntry()
+        return new PortfolioEntry()
             .amount(UPDATED_AMOUNT)
             .price(UPDATED_PRICE)
             .bought(UPDATED_BOUGHT)
@@ -123,16 +137,21 @@ class PortfolioEntryResourceIT {
             .group2(UPDATED_GROUP_2)
             .group3(UPDATED_GROUP_3)
             .group4(UPDATED_GROUP_4);
-        return portfolioEntry;
     }
 
     @BeforeEach
     public void initTest() {
-        portfolioEntry = createEntity(em);
+        User user = UserResourceIT.initTestUser(userRepository, em);
+        userRepository.saveAndFlush(user);
+        portfolio = PortfolioResourceIT.createEntity(em).user(user);
+        portfolioEntry = createEntity(em).portfolio(portfolio);
+        portfolioRepository.saveAndFlush(portfolio);
+        when(userService.getUserByName(UserResourceIT.DEFAULT_LOGIN)).thenReturn(Optional.of(user));
     }
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void createPortfolioEntry() throws Exception {
         int databaseSizeBeforeCreate = portfolioEntryRepository.findAll().size();
         // Create the PortfolioEntry
@@ -161,6 +180,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void createPortfolioEntryWithExistingId() throws Exception {
         // Create the PortfolioEntry with an existing ID
         portfolioEntry.setId(1L);
@@ -241,6 +261,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void getAllPortfolioEntries() throws Exception {
         // Initialize the database
         portfolioEntryRepository.saveAndFlush(portfolioEntry);
@@ -263,6 +284,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void getPortfolioEntry() throws Exception {
         // Initialize the database
         portfolioEntryRepository.saveAndFlush(portfolioEntry);
@@ -285,6 +307,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void getNonExistingPortfolioEntry() throws Exception {
         // Get the portfolioEntry
         restPortfolioEntryMockMvc.perform(get("/api/portfolio-entries/{id}", Long.MAX_VALUE))
@@ -293,6 +316,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void updatePortfolioEntry() throws Exception {
         // Initialize the database
         portfolioEntryRepository.saveAndFlush(portfolioEntry);
@@ -312,7 +336,8 @@ class PortfolioEntryResourceIT {
             .group1(UPDATED_GROUP_1)
             .group2(UPDATED_GROUP_2)
             .group3(UPDATED_GROUP_3)
-            .group4(UPDATED_GROUP_4);
+            .group4(UPDATED_GROUP_4)
+            .portfolio(portfolio);
 
         restPortfolioEntryMockMvc.perform(put("/api/portfolio-entries").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
@@ -339,6 +364,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void updateNonExistingPortfolioEntry() throws Exception {
         int databaseSizeBeforeUpdate = portfolioEntryRepository.findAll().size();
 
@@ -359,6 +385,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void partialUpdatePortfolioEntryWithPatch() throws Exception {
 
 // Initialize the database
@@ -399,6 +426,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void fullUpdatePortfolioEntryWithPatch() throws Exception {
 
 // Initialize the database
@@ -419,7 +447,8 @@ class PortfolioEntryResourceIT {
             .group1(UPDATED_GROUP_1)
             .group2(UPDATED_GROUP_2)
             .group3(UPDATED_GROUP_3)
-            .group4(UPDATED_GROUP_4);
+            .group4(UPDATED_GROUP_4)
+            .portfolio(portfolio);
 
         restPortfolioEntryMockMvc.perform(patch("/api/portfolio-entries").with(csrf())
             .contentType("application/merge-patch+json")
@@ -443,6 +472,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void partialUpdatePortfolioEntryShouldThrown() throws Exception {
         // Update the portfolioEntry without id should throw
         PortfolioEntry partialUpdatedPortfolioEntry = new PortfolioEntry();
@@ -455,6 +485,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void deletePortfolioEntry() throws Exception {
         // Initialize the database
         portfolioEntryRepository.saveAndFlush(portfolioEntry);
@@ -476,6 +507,7 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
     void searchPortfolioEntry() throws Exception {
         // Configure the mock search repository
         // Initialize the database
@@ -497,5 +529,13 @@ class PortfolioEntryResourceIT {
             .andExpect(jsonPath("$.[*].group2").value(hasItem(DEFAULT_GROUP_2)))
             .andExpect(jsonPath("$.[*].group3").value(hasItem(DEFAULT_GROUP_3)))
             .andExpect(jsonPath("$.[*].group4").value(hasItem(DEFAULT_GROUP_4)));
+    }
+
+
+    @Test
+    @Transactional
+    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
+    void restrictAccess() {
+
     }
 }

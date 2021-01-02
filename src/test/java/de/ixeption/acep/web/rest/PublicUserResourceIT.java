@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link UserResource} REST controller.
  */
 @AutoConfigureMockMvc
-@WithMockUser(authorities = Role.ROLE_ADMIN.name())
+@WithMockUser(authorities = "ROLE_ADMIN")
 @IntegrationTest
 class PublicUserResourceIT {
 

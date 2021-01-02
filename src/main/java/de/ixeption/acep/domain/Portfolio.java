@@ -156,4 +156,9 @@ public class Portfolio implements Serializable {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public Portfolio user(User user) {
+        setUser(user);
+        return this;
+    }
 }

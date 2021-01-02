@@ -70,10 +70,9 @@ class PortfolioResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Portfolio createEntity(EntityManager em) {
-        Portfolio portfolio = new Portfolio()
+        return new Portfolio()
             .name(DEFAULT_NAME)
             .created(DEFAULT_CREATED);
-        return portfolio;
     }
 
     /**
@@ -83,10 +82,9 @@ class PortfolioResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Portfolio createUpdatedEntity(EntityManager em) {
-        Portfolio portfolio = new Portfolio()
+        return new Portfolio()
             .name(UPDATED_NAME)
             .created(UPDATED_CREATED);
-        return portfolio;
     }
 
     @BeforeEach
