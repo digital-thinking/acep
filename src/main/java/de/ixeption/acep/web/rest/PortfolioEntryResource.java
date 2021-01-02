@@ -2,6 +2,7 @@ package de.ixeption.acep.web.rest;
 
 import de.ixeption.acep.domain.PortfolioEntry;
 import de.ixeption.acep.domain.User;
+import de.ixeption.acep.domain.search.PortfolioEntrySearchDTO;
 import de.ixeption.acep.repository.PortfolioEntryRepository;
 import de.ixeption.acep.repository.search.PortfolioEntrySearchRepository;
 import de.ixeption.acep.web.rest.errors.BadRequestAlertException;
@@ -63,7 +64,7 @@ public class PortfolioEntryResource extends AbstractResource {
         User loggedInUser = getLoggedInUser();
         if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
             PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
-            portfolioEntrySearchRepository.save(result);
+            portfolioEntrySearchRepository.save(new PortfolioEntrySearchDTO(result));
             return ResponseEntity.created(new URI("/api/portfolio-entries/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
                 .body(result);
@@ -104,7 +105,7 @@ public class PortfolioEntryResource extends AbstractResource {
 
         if (hasAccessToExistingEntry(portfolioEntry.getId()) != null) {
             PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
-            portfolioEntrySearchRepository.save(result);
+            portfolioEntrySearchRepository.save(new PortfolioEntrySearchDTO(result));
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString()))
                 .body(result);
@@ -131,7 +132,7 @@ public class PortfolioEntryResource extends AbstractResource {
         if (existingEntry != null) {
             updateEntity(portfolioEntry, existingEntry);
             PortfolioEntry saved = portfolioEntryRepository.save(existingEntry);
-            PortfolioEntry ignored = portfolioEntrySearchRepository.save(saved);
+            portfolioEntrySearchRepository.save(new PortfolioEntrySearchDTO(saved));
             return ResponseUtil.wrapOrNotFound(
                 Optional.of(saved),
                 HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString())
@@ -254,7 +255,9 @@ public class PortfolioEntryResource extends AbstractResource {
         log.debug("REST request to search PortfolioEntries for query {}", query);
         return StreamSupport
             .stream(portfolioEntrySearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .filter(portfolioEntry -> portfolioEntry.getPortfolio().getUser().equals(getLoggedInUser()))
+            .map(dto -> portfolioEntryRepository.findById(dto.getId()))
+            .flatMap(Optional::stream)
+            .filter(portfolioEntry -> portfolioEntry.getPortfolio().getUser().equals(getLoggedInUser()) || isAdminUser())
             .collect(Collectors.toList());
     }
 }

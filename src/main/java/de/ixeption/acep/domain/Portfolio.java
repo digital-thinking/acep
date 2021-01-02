@@ -5,6 +5,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -28,9 +29,12 @@ public class Portfolio implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
+    @Field(index = false, docValues = false)
     private Long id;
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+    @Field(index = false, docValues = false)
     private User user;
 
     @NotNull
@@ -40,6 +44,7 @@ public class Portfolio implements Serializable {
 
     @Column(name = "created")
     @CreationTimestamp
+    @Field(index = false, docValues = false)
     private LocalDateTime created;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.REMOVE)

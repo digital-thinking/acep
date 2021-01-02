@@ -6,6 +6,7 @@ import de.ixeption.acep.domain.enumeration.Currency;
 import de.ixeption.acep.domain.enumeration.Source;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -27,6 +28,7 @@ public class Asset implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
+    @Field(index = false, docValues = false)
     private Long id;
 
     @NotNull
@@ -36,11 +38,13 @@ public class Asset implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "currency", nullable = false)
+    @Field(index = false, docValues = false)
     private Currency currency;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "asset_type", nullable = false)
+    @Field(index = false, docValues = false)
     private AssetType assetType;
 
     @NotNull
@@ -50,6 +54,7 @@ public class Asset implements Serializable {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "source", nullable = false)
+    @Field(index = false, docValues = false)
     private Source source;
 
     @OneToMany(mappedBy = "asset")
@@ -58,6 +63,7 @@ public class Asset implements Serializable {
         "portfolio",
         "asset",
     }, allowSetters = true)
+    @Field(index = false, docValues = false)
     private Set<PortfolioEntry> portfolioEntries = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

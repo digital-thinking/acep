@@ -3,7 +3,6 @@ package de.ixeption.acep.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "portfolio_entry")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@Document(indexName = "portfolioentry")
 public class PortfolioEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
