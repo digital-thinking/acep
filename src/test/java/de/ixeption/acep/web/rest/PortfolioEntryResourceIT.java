@@ -534,8 +534,88 @@ class PortfolioEntryResourceIT {
 
     @Test
     @Transactional
-    @WithMockUser(username = UserResourceIT.DEFAULT_LOGIN, authorities = "ROLE_USER")
-    void restrictAccess() {
+    @WithMockUser(username = "Other", authorities = "ROLE_USER")
+    void restrictUpdateAccess() throws Exception {
+        portfolioEntryRepository.saveAndFlush(portfolioEntry);
+        int databaseSizeBeforeCreate = portfolioEntryRepository.findAll().size();
 
+        User otherUser = createOtherUser();
+        Portfolio portfolio = PortfolioResourceIT.createEntity(em).user(otherUser);
+        portfolioRepository.saveAndFlush(portfolio);
+
+        PortfolioEntry updateIt = portfolioEntryRepository.findById(portfolioEntry.getId()).get();
+        updateIt.setPortfolio(portfolio);
+        em.detach(updateIt);
+
+        restPortfolioEntryMockMvc.perform(put("/api/portfolio-entries").with(csrf())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtil.convertObjectToJsonBytes(portfolioEntry)))
+            .andExpect(status().isBadRequest());
+
+        assertThat(databaseSizeBeforeCreate).isEqualTo(portfolioEntryRepository.findAll().size());
+
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "Other", authorities = "ROLE_USER")
+    void restrictDeleteAccess() throws Exception {
+        portfolioEntryRepository.saveAndFlush(portfolioEntry);
+        int databaseSizeBeforeCreate = portfolioEntryRepository.findAll().size();
+
+        createOtherUser();
+
+        // Delete the portfolioEntry
+        restPortfolioEntryMockMvc.perform(delete("/api/portfolio-entries/{id}", portfolioEntry.getId()).with(csrf())
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+
+        assertThat(databaseSizeBeforeCreate).isEqualTo(portfolioEntryRepository.findAll().size());
+
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "Other", authorities = "ROLE_USER")
+    void restrictGetAccess() throws Exception {
+        // Initialize the database
+        portfolioEntryRepository.saveAndFlush(portfolioEntry);
+        createOtherUser();
+
+        // Get the portfolioEntry
+        restPortfolioEntryMockMvc.perform(get("/api/portfolio-entries/{id}", portfolioEntry.getId()))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser(username = "Other", authorities = "ROLE_USER")
+    void restrictSearchAccess() throws Exception {
+        portfolioEntryRepository.saveAndFlush(portfolioEntry);
+        int databaseSizeBeforeCreate = portfolioEntryRepository.findAll().size();
+        createOtherUser();
+
+        when(mockPortfolioEntrySearchRepository.search(queryStringQuery("id:" + portfolioEntry.getId())))
+            .thenReturn(Collections.singletonList(portfolioEntry));
+
+        // Search the portfolioEntry
+        restPortfolioEntryMockMvc.perform(get("/api/_search/portfolio-entries?query=id:" + portfolioEntry.getId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().string("[]"))
+            .andExpect(jsonPath("$.[*].id").isEmpty());
+
+
+        assertThat(databaseSizeBeforeCreate).isEqualTo(portfolioEntryRepository.findAll().size());
+
+    }
+
+    private User createOtherUser() {
+        User otherUser = UserResourceIT.initTestUser(userRepository, em);
+        otherUser.setLogin("Other");
+        otherUser.setEmail("test@test.de");
+        userRepository.saveAndFlush(otherUser);
+        when(userService.getUserByName("Other")).thenReturn(Optional.of(otherUser));
+        return otherUser;
     }
 }

@@ -78,6 +78,8 @@ public class PortfolioResource extends AbstractResource {
     @PutMapping("/portfolios")
     public ResponseEntity<Portfolio> updatePortfolio(@Valid @RequestBody Portfolio portfolio) throws URISyntaxException {
         log.debug("REST request to update Portfolio : {}", portfolio);
+        // TODO check existing user
+
         if (portfolio.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -105,7 +107,7 @@ public class PortfolioResource extends AbstractResource {
         if (portfolio.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-
+        // TODO check existing user
 
         Optional<Portfolio> result = portfolioRepository.findById(portfolio.getId())
             .map(existingPortfolio -> {

@@ -73,6 +73,19 @@ public class PortfolioEntryResource extends AbstractResource {
 
     }
 
+    private PortfolioEntry hasAccessToExistingEntry(Long entryId) {
+        if (entryId != null) {
+            Optional<PortfolioEntry> existingPortfolioEntryOptional = portfolioEntryRepository.findById(entryId);
+            if (existingPortfolioEntryOptional.isPresent()) {
+                PortfolioEntry existingPortfolioEntry = existingPortfolioEntryOptional.get();
+                if (existingPortfolioEntry.getPortfolio().getUser().equals(getLoggedInUser()) || isAdminUser()) {
+                    return existingPortfolioEntry;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * {@code PUT  /portfolio-entries} : Updates an existing portfolioEntry.
      *
@@ -88,8 +101,8 @@ public class PortfolioEntryResource extends AbstractResource {
         if (portfolioEntry.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        User loggedInUser = getLoggedInUser();
-        if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
+
+        if (hasAccessToExistingEntry(portfolioEntry.getId()) != null) {
             PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
             portfolioEntrySearchRepository.save(result);
             return ResponseEntity.ok()
@@ -114,24 +127,17 @@ public class PortfolioEntryResource extends AbstractResource {
     @PatchMapping(value = "/portfolio-entries", consumes = "application/merge-patch+json")
     public ResponseEntity<PortfolioEntry> partialUpdatePortfolioEntry(@NotNull @RequestBody PortfolioEntry portfolioEntry) throws URISyntaxException {
         log.debug("REST request to update PortfolioEntry partially : {}", portfolioEntry);
-        User loggedInUser = getLoggedInUser();
-        if (portfolioEntry.getId() != null) {
-            Optional<PortfolioEntry> existingPortfolioEntryOptional = portfolioEntryRepository.findById(portfolioEntry.getId());
-
-            if (existingPortfolioEntryOptional.isPresent()) {
-                PortfolioEntry existingPortfolioEntry = existingPortfolioEntryOptional.get();
-                if (existingPortfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
-                    updateEntity(portfolioEntry, existingPortfolioEntry);
-                    PortfolioEntry saved = portfolioEntryRepository.save(existingPortfolioEntry);
-                    PortfolioEntry ignored = portfolioEntrySearchRepository.save(saved);
-                    return ResponseUtil.wrapOrNotFound(
-                        Optional.of(saved),
-                        HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString())
-                    );
-                }
-
-            }
+        PortfolioEntry existingEntry = hasAccessToExistingEntry(portfolioEntry.getId());
+        if (existingEntry != null) {
+            updateEntity(portfolioEntry, existingEntry);
+            PortfolioEntry saved = portfolioEntryRepository.save(existingEntry);
+            PortfolioEntry ignored = portfolioEntrySearchRepository.save(saved);
+            return ResponseUtil.wrapOrNotFound(
+                Optional.of(saved),
+                HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString())
+            );
         }
+
         throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
 
 
