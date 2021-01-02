@@ -4,7 +4,7 @@ import de.ixeption.acep.IntegrationTest;
 import de.ixeption.acep.domain.User;
 import de.ixeption.acep.repository.UserRepository;
 import de.ixeption.acep.repository.search.UserSearchRepository;
-import de.ixeption.acep.security.AuthoritiesConstants;
+import de.ixeption.acep.security.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link UserResource} REST controller.
  */
 @AutoConfigureMockMvc
-@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
+@WithMockUser(authorities = Role.ROLE_ADMIN.name())
 @IntegrationTest
 class PublicUserResourceIT {
 
@@ -90,7 +90,7 @@ class PublicUserResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$").value(hasItems(AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)));
+            .andExpect(jsonPath("$").value(hasItems(Role.ROLE_USER.name(), Role.ROLE_ADMIN.name())));
     }
 
     @Test

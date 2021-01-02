@@ -11,7 +11,7 @@
                         <span>{{portfolio.name}}</span>
                     </dd>
                     <dt>
-                        <span v-text="$t('acepApp.portfolio.created')">Created</span>
+                        <span v-text="$t('acepApp.portfolio.createdDate')">Created</span>
                     </dt>
                     <dd>
                         <span v-if="portfolio.created">{{$d(Date.parse(portfolio.created), 'long') }}</span>

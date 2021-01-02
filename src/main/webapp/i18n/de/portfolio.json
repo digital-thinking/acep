@@ -20,8 +20,8 @@
       },
       "id": "ID",
       "name": "Name",
-      "created": "Created",
-      "portfolioEntry": "Portfolio Entry"
+      "createdDate": "Erstellungsdatum",
+      "portfolioEntry": "Portfolioeintrag"
     }
   }
 }

@@ -23,6 +23,12 @@
       "otherEntityName": "portfolioEntry",
       "otherEntityRelationshipName": "portfolio",
       "relationshipName": "portfolioEntry"
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "portfolio",
+      "relationshipName": "userPortfolio"
     }
   ],
   "entityTableName": "portfolio",

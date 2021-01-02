@@ -24,6 +24,7 @@
                         <select class="form-control" name="currency" :class="{'valid': !$v.asset.currency.$invalid, 'invalid': $v.asset.currency.$invalid }" v-model="$v.asset.currency.$model" id="asset-currency" data-cy="currency"  required>
                             <option value="AED" v-bind:label="$t('acepApp.Currency.AED')">AED</option>
                             <option value="USD" v-bind:label="$t('acepApp.Currency.USD')">USD</option>
+                            <option v-bind:label="$t('acepApp.Currency.EUR')" value="EUR">EUR</option>
                         </select>
                         <div v-if="$v.asset.currency.$anyDirty && $v.asset.currency.$invalid">
                             <small class="form-text text-danger" v-if="!$v.asset.currency.required" v-text="$t('entity.validation.required')">

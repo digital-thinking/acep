@@ -5,7 +5,7 @@ import de.ixeption.acep.domain.Authority;
 import de.ixeption.acep.domain.User;
 import de.ixeption.acep.repository.UserRepository;
 import de.ixeption.acep.repository.search.UserSearchRepository;
-import de.ixeption.acep.security.AuthoritiesConstants;
+import de.ixeption.acep.security.Role;
 import de.ixeption.acep.service.dto.AdminUserDTO;
 import de.ixeption.acep.service.mapper.UserMapper;
 import de.ixeption.acep.web.rest.vm.ManagedUserVM;
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the {@link UserResource} REST controller.
  */
 @AutoConfigureMockMvc
-@WithMockUser(authorities = AuthoritiesConstants.ADMIN)
+@WithMockUser(authorities = Role.ROLE_ADMIN.name())
 @IntegrationTest
 class UserResourceIT {
 
@@ -145,7 +145,7 @@ class UserResourceIT {
         managedUserVM.setActivated(true);
         managedUserVM.setImageUrl(DEFAULT_IMAGEURL);
         managedUserVM.setLangKey(DEFAULT_LANGKEY);
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         restUserMockMvc
             .perform(
@@ -186,7 +186,7 @@ class UserResourceIT {
         managedUserVM.setActivated(true);
         managedUserVM.setImageUrl(DEFAULT_IMAGEURL);
         managedUserVM.setLangKey(DEFAULT_LANGKEY);
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restUserMockMvc
@@ -219,7 +219,7 @@ class UserResourceIT {
         managedUserVM.setActivated(true);
         managedUserVM.setImageUrl(DEFAULT_IMAGEURL);
         managedUserVM.setLangKey(DEFAULT_LANGKEY);
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         // Create the User
         restUserMockMvc
@@ -252,7 +252,7 @@ class UserResourceIT {
         managedUserVM.setActivated(true);
         managedUserVM.setImageUrl(DEFAULT_IMAGEURL);
         managedUserVM.setLangKey(DEFAULT_LANGKEY);
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         // Create the User
         restUserMockMvc
@@ -341,7 +341,7 @@ class UserResourceIT {
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
         managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         restUserMockMvc
             .perform(
@@ -390,7 +390,7 @@ class UserResourceIT {
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
         managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         restUserMockMvc
             .perform(
@@ -452,7 +452,7 @@ class UserResourceIT {
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
         managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         restUserMockMvc
             .perform(
@@ -500,7 +500,7 @@ class UserResourceIT {
         managedUserVM.setCreatedDate(updatedUser.getCreatedDate());
         managedUserVM.setLastModifiedBy(updatedUser.getLastModifiedBy());
         managedUserVM.setLastModifiedDate(updatedUser.getLastModifiedDate());
-        managedUserVM.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        managedUserVM.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         restUserMockMvc
             .perform(
@@ -557,7 +557,7 @@ class UserResourceIT {
         userDTO.setLangKey(DEFAULT_LANGKEY);
         userDTO.setCreatedBy(DEFAULT_LOGIN);
         userDTO.setLastModifiedBy(DEFAULT_LOGIN);
-        userDTO.setAuthorities(Collections.singleton(AuthoritiesConstants.USER));
+        userDTO.setAuthorities(Collections.singleton(Role.ROLE_USER.name()));
 
         User user = userMapper.userDTOToUser(userDTO);
         assertThat(user.getId()).isEqualTo(DEFAULT_ID);
@@ -572,7 +572,7 @@ class UserResourceIT {
         assertThat(user.getCreatedDate()).isNotNull();
         assertThat(user.getLastModifiedBy()).isNull();
         assertThat(user.getLastModifiedDate()).isNotNull();
-        assertThat(user.getAuthorities()).extracting("name").containsExactly(AuthoritiesConstants.USER);
+        assertThat(user.getAuthorities()).extracting("name").containsExactly(Role.ROLE_USER.name());
     }
 
     @Test
@@ -584,7 +584,7 @@ class UserResourceIT {
         user.setLastModifiedDate(Instant.now());
         Set<Authority> authorities = new HashSet<>();
         Authority authority = new Authority();
-        authority.setName(AuthoritiesConstants.USER);
+        authority.setName(Role.ROLE_USER.name());
         authorities.add(authority);
         user.setAuthorities(authorities);
 
@@ -602,7 +602,7 @@ class UserResourceIT {
         assertThat(userDTO.getCreatedDate()).isEqualTo(user.getCreatedDate());
         assertThat(userDTO.getLastModifiedBy()).isEqualTo(DEFAULT_LOGIN);
         assertThat(userDTO.getLastModifiedDate()).isEqualTo(user.getLastModifiedDate());
-        assertThat(userDTO.getAuthorities()).containsExactly(AuthoritiesConstants.USER);
+        assertThat(userDTO.getAuthorities()).containsExactly(Role.ROLE_USER.name());
         assertThat(userDTO.toString()).isNotNull();
     }
 
@@ -616,13 +616,13 @@ class UserResourceIT {
         Authority authorityB = new Authority();
         assertThat(authorityA).isEqualTo(authorityB);
 
-        authorityB.setName(AuthoritiesConstants.ADMIN);
+        authorityB.setName(Role.ROLE_ADMIN.name());
         assertThat(authorityA).isNotEqualTo(authorityB);
 
-        authorityA.setName(AuthoritiesConstants.USER);
+        authorityA.setName(Role.ROLE_USER.name());
         assertThat(authorityA).isNotEqualTo(authorityB);
 
-        authorityB.setName(AuthoritiesConstants.USER);
+        authorityB.setName(Role.ROLE_USER.name());
         assertThat(authorityA).isEqualTo(authorityB).hasSameHashCodeAs(authorityB);
     }
 

@@ -1,6 +1,7 @@
 package de.ixeption.acep.web.rest;
 
 import de.ixeption.acep.domain.PortfolioEntry;
+import de.ixeption.acep.domain.User;
 import de.ixeption.acep.repository.PortfolioEntryRepository;
 import de.ixeption.acep.repository.search.PortfolioEntrySearchRepository;
 import de.ixeption.acep.web.rest.errors.BadRequestAlertException;
@@ -30,7 +31,7 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 @RestController
 @RequestMapping("/api")
 @Transactional
-public class PortfolioEntryResource {
+public class PortfolioEntryResource extends AbstractResource {
 
     private static final String ENTITY_NAME = "portfolioEntry";
     private final Logger log = LoggerFactory.getLogger(PortfolioEntryResource.class);
@@ -54,14 +55,18 @@ public class PortfolioEntryResource {
     @PostMapping("/portfolio-entries")
     public ResponseEntity<PortfolioEntry> createPortfolioEntry(@Valid @RequestBody PortfolioEntry portfolioEntry) throws URISyntaxException {
         log.debug("REST request to save PortfolioEntry : {}", portfolioEntry);
-        if (portfolioEntry.getId() != null) {
-            throw new BadRequestAlertException("A new portfolioEntry cannot already have an ID", ENTITY_NAME, "idexists");
+
+        User loggedInUser = getLoggedInUser();
+        if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
+            PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
+            portfolioEntrySearchRepository.save(result);
+            return ResponseEntity.created(new URI("/api/portfolio-entries/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                .body(result);
         }
-        PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
-        portfolioEntrySearchRepository.save(result);
-        return ResponseEntity.created(new URI("/api/portfolio-entries/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+
+        throw new BadRequestAlertException("A new portfolioEntry cannot already have an ID", ENTITY_NAME, "idnull");
+
     }
 
     /**
@@ -76,14 +81,16 @@ public class PortfolioEntryResource {
     @PutMapping("/portfolio-entries")
     public ResponseEntity<PortfolioEntry> updatePortfolioEntry(@Valid @RequestBody PortfolioEntry portfolioEntry) throws URISyntaxException {
         log.debug("REST request to update PortfolioEntry : {}", portfolioEntry);
-        if (portfolioEntry.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        User loggedInUser = getLoggedInUser();
+        if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
+            PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
+            portfolioEntrySearchRepository.save(result);
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString()))
+                .body(result);
         }
-        PortfolioEntry result = portfolioEntryRepository.save(portfolioEntry);
-        portfolioEntrySearchRepository.save(result);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString()))
-            .body(result);
+
+        throw new BadRequestAlertException("Couldn't update Portfolio", ENTITY_NAME, "idnull");
     }
 
 
@@ -100,64 +107,64 @@ public class PortfolioEntryResource {
     @PatchMapping(value = "/portfolio-entries", consumes = "application/merge-patch+json")
     public ResponseEntity<PortfolioEntry> partialUpdatePortfolioEntry(@NotNull @RequestBody PortfolioEntry portfolioEntry) throws URISyntaxException {
         log.debug("REST request to update PortfolioEntry partially : {}", portfolioEntry);
-        if (portfolioEntry.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        User loggedInUser = getLoggedInUser();
+        if (portfolioEntry.getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
+            Optional<PortfolioEntry> result = portfolioEntryRepository.findById(portfolioEntry.getId())
+                .map(existingPortfolioEntry -> {
+                    if (portfolioEntry.getAmount() != null) {
+                        existingPortfolioEntry.setAmount(portfolioEntry.getAmount());
+                    }
+
+                    if (portfolioEntry.getPrice() != null) {
+                        existingPortfolioEntry.setPrice(portfolioEntry.getPrice());
+                    }
+
+                    if (portfolioEntry.getBought() != null) {
+                        existingPortfolioEntry.setBought(portfolioEntry.getBought());
+                    }
+
+                    if (portfolioEntry.getSold() != null) {
+                        existingPortfolioEntry.setSold(portfolioEntry.getSold());
+                    }
+
+                    if (portfolioEntry.getCustomName() != null) {
+                        existingPortfolioEntry.setCustomName(portfolioEntry.getCustomName());
+                    }
+
+                    if (portfolioEntry.getGroup1() != null) {
+                        existingPortfolioEntry.setGroup1(portfolioEntry.getGroup1());
+                    }
+
+                    if (portfolioEntry.getGroup2() != null) {
+                        existingPortfolioEntry.setGroup2(portfolioEntry.getGroup2());
+                    }
+
+                    if (portfolioEntry.getGroup3() != null) {
+                        existingPortfolioEntry.setGroup3(portfolioEntry.getGroup3());
+                    }
+
+                    if (portfolioEntry.getGroup4() != null) {
+                        existingPortfolioEntry.setGroup4(portfolioEntry.getGroup4());
+                    }
+
+
+                    return existingPortfolioEntry;
+                })
+                .map(portfolioEntryRepository::save)
+                .map(savedPortfolioEntry -> {
+                    portfolioEntrySearchRepository.save(savedPortfolioEntry);
+
+                    return savedPortfolioEntry;
+
+                });
+
+            return ResponseUtil.wrapOrNotFound(
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString())
+            );
         }
+        throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
 
-
-        Optional<PortfolioEntry> result = portfolioEntryRepository.findById(portfolioEntry.getId())
-            .map(existingPortfolioEntry -> {
-                if (portfolioEntry.getAmount() != null) {
-                    existingPortfolioEntry.setAmount(portfolioEntry.getAmount());
-                }
-
-                if (portfolioEntry.getPrice() != null) {
-                    existingPortfolioEntry.setPrice(portfolioEntry.getPrice());
-                }
-
-                if (portfolioEntry.getBought() != null) {
-                    existingPortfolioEntry.setBought(portfolioEntry.getBought());
-                }
-
-                if (portfolioEntry.getSold() != null) {
-                    existingPortfolioEntry.setSold(portfolioEntry.getSold());
-                }
-
-                if (portfolioEntry.getCustomName() != null) {
-                    existingPortfolioEntry.setCustomName(portfolioEntry.getCustomName());
-                }
-
-                if (portfolioEntry.getGroup1() != null) {
-                    existingPortfolioEntry.setGroup1(portfolioEntry.getGroup1());
-                }
-
-                if (portfolioEntry.getGroup2() != null) {
-                    existingPortfolioEntry.setGroup2(portfolioEntry.getGroup2());
-                }
-
-                if (portfolioEntry.getGroup3() != null) {
-                    existingPortfolioEntry.setGroup3(portfolioEntry.getGroup3());
-                }
-
-                if (portfolioEntry.getGroup4() != null) {
-                    existingPortfolioEntry.setGroup4(portfolioEntry.getGroup4());
-                }
-
-
-                return existingPortfolioEntry;
-            })
-            .map(portfolioEntryRepository::save)
-            .map(savedPortfolioEntry -> {
-                portfolioEntrySearchRepository.save(savedPortfolioEntry);
-
-                return savedPortfolioEntry;
-
-            });
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, portfolioEntry.getId().toString())
-        );
     }
 
     /**
@@ -168,7 +175,13 @@ public class PortfolioEntryResource {
     @GetMapping("/portfolio-entries")
     public List<PortfolioEntry> getAllPortfolioEntries() {
         log.debug("REST request to get all PortfolioEntries");
-        return portfolioEntryRepository.findAll();
+        User loggedInUser = getLoggedInUser();
+        if (isAdminUser()) {
+            return portfolioEntryRepository.findAll();
+        } else {
+            return portfolioEntryRepository.findAllByUserId(loggedInUser.getId());
+        }
+
     }
 
     /**
@@ -181,7 +194,11 @@ public class PortfolioEntryResource {
     public ResponseEntity<PortfolioEntry> getPortfolioEntry(@PathVariable Long id) {
         log.debug("REST request to get PortfolioEntry : {}", id);
         Optional<PortfolioEntry> portfolioEntry = portfolioEntryRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(portfolioEntry);
+        User loggedInUser = getLoggedInUser();
+        if (portfolioEntry.isPresent() && portfolioEntry.get().getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
+            return ResponseUtil.wrapOrNotFound(portfolioEntry);
+        }
+        throw new BadRequestAlertException("not logged in", ENTITY_NAME, "messages.register.noaccount");
     }
 
     /**
@@ -193,9 +210,15 @@ public class PortfolioEntryResource {
     @DeleteMapping("/portfolio-entries/{id}")
     public ResponseEntity<Void> deletePortfolioEntry(@PathVariable Long id) {
         log.debug("REST request to delete PortfolioEntry : {}", id);
-        portfolioEntryRepository.deleteById(id);
-        portfolioEntrySearchRepository.deleteById(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+
+        Optional<PortfolioEntry> portfolioEntry = portfolioEntryRepository.findById(id);
+        User loggedInUser = getLoggedInUser();
+        if (portfolioEntry.isPresent() && portfolioEntry.get().getPortfolio().getUser().equals(loggedInUser) || isAdminUser()) {
+            portfolioEntryRepository.deleteById(id);
+            portfolioEntrySearchRepository.deleteById(id);
+            return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        }
+        throw new BadRequestAlertException("not logged in", ENTITY_NAME, "messages.register.noaccount");
     }
 
     /**
@@ -210,6 +233,7 @@ public class PortfolioEntryResource {
         log.debug("REST request to search PortfolioEntries for query {}", query);
         return StreamSupport
             .stream(portfolioEntrySearchRepository.search(queryStringQuery(query)).spliterator(), false)
+            .filter(portfolioEntry -> portfolioEntry.getPortfolio().getUser().equals(getLoggedInUser()))
             .collect(Collectors.toList());
     }
 }

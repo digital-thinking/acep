@@ -3,12 +3,14 @@ package de.ixeption.acep.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +20,7 @@ import java.util.Set;
 @Entity
 @Table(name = "portfolio")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "portfolio")
+@Document(indexName = "portfolio")
 public class Portfolio implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,15 +30,19 @@ public class Portfolio implements Serializable {
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
+    @ManyToOne
+    private User user;
+
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "name", length = 255, nullable = false)
     private String name;
 
     @Column(name = "created")
-    private Instant created;
+    @CreationTimestamp
+    private LocalDateTime created;
 
-    @OneToMany(mappedBy = "portfolio")
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.REMOVE)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = {
         "portfolio",
@@ -71,15 +77,15 @@ public class Portfolio implements Serializable {
         return this;
     }
 
-    public Instant getCreated() {
+    public LocalDateTime getCreated() {
         return this.created;
     }
 
-    public void setCreated(Instant created) {
+    public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 
-    public Portfolio created(Instant created) {
+    public Portfolio created(LocalDateTime created) {
         this.created = created;
         return this;
     }
@@ -141,5 +147,13 @@ public class Portfolio implements Serializable {
             ", name='" + getName() + "'" +
             ", created='" + getCreated() + "'" +
             "}";
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

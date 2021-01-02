@@ -17,21 +17,26 @@
                             <small class="form-text text-danger" v-if="!$v.portfolio.name.required" v-text="$t('entity.validation.required')">
                                 This field is required.
                             </small>
-                            <small class="form-text text-danger" v-if="!$v.portfolio.name.minLength" v-text="$t('entity.validation.minlength', {min: 1})">
+                            <small class="form-text text-danger" v-if="!$v.portfolio.name.minLength"
+                                   v-text="$t('entity.validation.minlength', {min: 1})">
                                 This field is required to be at least 1 characters.
                             </small>
-                            <small class="form-text text-danger" v-if="!$v.portfolio.name.maxLength" v-text="$t('entity.validation.maxlength', {max: 255})">
+                            <small class="form-text text-danger" v-if="!$v.portfolio.name.maxLength"
+                                   v-text="$t('entity.validation.maxlength', {max: 255})">
                                 This field cannot be longer than 255 characters.
                             </small>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-control-label" v-text="$t('acepApp.portfolio.created')" for="portfolio-created">Created</label>
+                    <div v-if="portfolio.created" class="form-group">
+                        <label class="form-control-label" for="portfolio-created"
+                               v-text="$t('acepApp.portfolio.createdDate')">Created</label>
                         <div class="d-flex">
-                            <input id="portfolio-created" data-cy="created" type="datetime-local" class="form-control" name="created" :class="{'valid': !$v.portfolio.created.$invalid, 'invalid': $v.portfolio.created.$invalid }"
-                            
-                            :value="convertDateTimeFromServer($v.portfolio.created.$model)"
-                            @change="updateInstantField('created', $event)"/>
+                            <input id="portfolio-created" data-cy="created" type="datetime-local" class="form-control"
+                                   name="created"
+                                   :class="{'valid': !$v.portfolio.created.$invalid, 'invalid': $v.portfolio.created.$invalid }"
+
+                                   :value="convertDateTimeFromServer($v.portfolio.created.$model)"
+                                   @change="updateInstantField('created', $event)"/>
                         </div>
                     </div>
                 </div>

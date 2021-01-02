@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,11 +46,11 @@ class PortfolioEntryResourceIT {
     private static final BigDecimal DEFAULT_PRICE = new BigDecimal(1);
     private static final BigDecimal UPDATED_PRICE = new BigDecimal(2);
 
-    private static final Instant DEFAULT_BOUGHT = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_BOUGHT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final LocalDateTime DEFAULT_BOUGHT = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
+    private static final LocalDateTime UPDATED_BOUGHT = LocalDateTime.now();
 
-    private static final Instant DEFAULT_SOLD = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_SOLD = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final LocalDateTime DEFAULT_SOLD = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
+    private static final LocalDateTime UPDATED_SOLD = LocalDateTime.now();
 
     private static final String DEFAULT_CUSTOM_NAME = "AAAAAAAAAA";
     private static final String UPDATED_CUSTOM_NAME = "BBBBBBBBBB";

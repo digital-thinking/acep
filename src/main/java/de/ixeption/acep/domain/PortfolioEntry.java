@@ -3,12 +3,13 @@ package de.ixeption.acep.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * A PortfolioEntry.
@@ -16,7 +17,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "portfolio_entry")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@org.springframework.data.elasticsearch.annotations.Document(indexName = "portfolioentry")
+@Document(indexName = "portfolioentry")
 public class PortfolioEntry implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -36,10 +37,10 @@ public class PortfolioEntry implements Serializable {
 
     @NotNull
     @Column(name = "bought", nullable = false)
-    private Instant bought;
+    private LocalDateTime bought;
 
     @Column(name = "sold")
-    private Instant sold;
+    private LocalDateTime sold;
 
     @Column(name = "custom_name")
     private String customName;
@@ -110,28 +111,28 @@ public class PortfolioEntry implements Serializable {
         return this;
     }
 
-    public Instant getBought() {
+    public LocalDateTime getBought() {
         return this.bought;
     }
 
-    public void setBought(Instant bought) {
+    public void setBought(LocalDateTime bought) {
         this.bought = bought;
     }
 
-    public PortfolioEntry bought(Instant bought) {
+    public PortfolioEntry bought(LocalDateTime bought) {
         this.bought = bought;
         return this;
     }
 
-    public Instant getSold() {
+    public LocalDateTime getSold() {
         return this.sold;
     }
 
-    public void setSold(Instant sold) {
+    public void setSold(LocalDateTime sold) {
         this.sold = sold;
     }
 
-    public PortfolioEntry sold(Instant sold) {
+    public PortfolioEntry sold(LocalDateTime sold) {
         this.sold = sold;
         return this;
     }

@@ -1,6 +1,7 @@
 package de.ixeption.acep.web.rest;
 
 import de.ixeption.acep.domain.Portfolio;
+import de.ixeption.acep.domain.User;
 import de.ixeption.acep.repository.PortfolioRepository;
 import de.ixeption.acep.repository.search.PortfolioSearchRepository;
 import de.ixeption.acep.web.rest.errors.BadRequestAlertException;
@@ -30,7 +31,7 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 @RestController
 @RequestMapping("/api")
 @Transactional
-public class PortfolioResource {
+public class PortfolioResource extends AbstractResource {
 
     private static final String ENTITY_NAME = "portfolio";
     private final Logger log = LoggerFactory.getLogger(PortfolioResource.class);
@@ -57,6 +58,7 @@ public class PortfolioResource {
         if (portfolio.getId() != null) {
             throw new BadRequestAlertException("A new portfolio cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        portfolio.setUser(getLoggedInUser());
         Portfolio result = portfolioRepository.save(portfolio);
         portfolioSearchRepository.save(result);
         return ResponseEntity.created(new URI("/api/portfolios/" + result.getId()))
@@ -140,7 +142,12 @@ public class PortfolioResource {
     @GetMapping("/portfolios")
     public List<Portfolio> getAllPortfolios() {
         log.debug("REST request to get all Portfolios");
-        return portfolioRepository.findAll();
+        User loggedInUser = getLoggedInUser();
+        if (isAdminUser()) {
+            return portfolioRepository.findAll();
+        } else {
+            return portfolioRepository.findAllByUserId(loggedInUser.getId());
+        }
     }
 
     /**
@@ -153,7 +160,11 @@ public class PortfolioResource {
     public ResponseEntity<Portfolio> getPortfolio(@PathVariable Long id) {
         log.debug("REST request to get Portfolio : {}", id);
         Optional<Portfolio> portfolio = portfolioRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(portfolio);
+        User loggedInUser = getLoggedInUser();
+        if (portfolio.isPresent() && portfolio.get().getUser().equals(loggedInUser) || isAdminUser()) {
+            return ResponseUtil.wrapOrNotFound(portfolio);
+        }
+        throw new BadRequestAlertException("not logged in", ENTITY_NAME, "messages.register.noaccount");
     }
 
     /**
@@ -165,9 +176,14 @@ public class PortfolioResource {
     @DeleteMapping("/portfolios/{id}")
     public ResponseEntity<Void> deletePortfolio(@PathVariable Long id) {
         log.debug("REST request to delete Portfolio : {}", id);
-        portfolioRepository.deleteById(id);
-        portfolioSearchRepository.deleteById(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        Optional<Portfolio> portfolio = portfolioRepository.findById(id);
+        User loggedInUser = getLoggedInUser();
+        if (portfolio.isPresent() && portfolio.get().getUser().equals(loggedInUser) || isAdminUser()) {
+            portfolioRepository.deleteById(id);
+            portfolioSearchRepository.deleteById(id);
+            return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        }
+        throw new BadRequestAlertException("not logged in", ENTITY_NAME, "messages.register.noaccount");
     }
 
     /**
@@ -182,6 +198,7 @@ public class PortfolioResource {
         log.debug("REST request to search Portfolios for query {}", query);
         return StreamSupport
             .stream(portfolioSearchRepository.search(queryStringQuery(query)).spliterator(), false)
+            .filter(portfolio -> portfolio.getUser().equals(getLoggedInUser()))
             .collect(Collectors.toList());
     }
 }

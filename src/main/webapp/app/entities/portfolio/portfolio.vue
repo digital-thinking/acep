@@ -42,7 +42,7 @@
                 <tr>
                     <th scope="row"><span v-text="$t('global.field.id')">ID</span></th>
                     <th scope="row"><span v-text="$t('acepApp.portfolio.name')">Name</span></th>
-                    <th scope="row"><span v-text="$t('acepApp.portfolio.created')">Created</span></th>
+                    <th scope="row"><span v-text="$t('acepApp.portfolio.createdDate')">Created</span></th>
                     <th scope="row"></th>
                 </tr>
                 </thead>

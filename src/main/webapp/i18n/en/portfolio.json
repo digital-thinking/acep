@@ -20,7 +20,7 @@
       },
       "id": "ID",
       "name": "Name",
-      "created": "Created",
+      "createdDate": "Created date",
       "portfolioEntry": "Portfolio Entry"
     }
   }

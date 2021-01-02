@@ -7,7 +7,7 @@ import de.ixeption.acep.repository.AuthorityRepository;
 import de.ixeption.acep.repository.PersistentTokenRepository;
 import de.ixeption.acep.repository.UserRepository;
 import de.ixeption.acep.repository.search.UserSearchRepository;
-import de.ixeption.acep.security.AuthoritiesConstants;
+import de.ixeption.acep.security.Role;
 import de.ixeption.acep.security.SecurityUtils;
 import de.ixeption.acep.service.dto.AdminUserDTO;
 import de.ixeption.acep.service.dto.UserDTO;
@@ -150,7 +150,7 @@ public class UserService {
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();
-        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        authorityRepository.findById(Role.ROLE_USER.name()).ifPresent(authorities::add);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
         userSearchRepository.save(newUser);
@@ -382,5 +382,9 @@ public class UserService {
         if (user.getEmail() != null) {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
         }
+    }
+
+    public Optional<User> getUserByName(String username) {
+        return userRepository.findOneByLogin(username);
     }
 }
