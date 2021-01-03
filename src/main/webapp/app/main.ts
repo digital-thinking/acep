@@ -30,6 +30,7 @@ import TranslationService from '@/locale/translation.service';
 import PortfolioService from '@/entities/portfolio/portfolio.service';
 import PortfolioEntryService from '@/entities/portfolio-entry/portfolio-entry.service';
 import AssetService from '@/entities/asset/asset.service';
+import AssetSymbolService from "@/entities/symbol/asset-symbol.service";
 // jhipster-needle-add-entity-service-to-main-import - JHipster will import entities services here
 
 /* tslint:enable */
@@ -91,6 +92,8 @@ new Vue({
     portfolioService: () => new PortfolioService(),
     portfolioEntryService: () => new PortfolioEntryService(),
     assetService: () => new AssetService(),
+    assetSymbolService: () => new AssetSymbolService(),
+
     // jhipster-needle-add-entity-service-to-main - JHipster will import entities services here
     accountService: () => accountService,
   },

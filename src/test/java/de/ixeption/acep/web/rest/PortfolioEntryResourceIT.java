@@ -198,7 +198,7 @@ class PortfolioEntryResourceIT {
         assertThat(portfolioEntryList).hasSize(databaseSizeBeforeCreate);
 
         // Validate the PortfolioEntry in Elasticsearch
-        verify(mockPortfolioEntrySearchRepository, times(0)).save(portfolioEntry);
+//        verify(mockPortfolioEntrySearchRepository, times(0)).save(portfolioEntry);
     }
 
 
@@ -359,7 +359,7 @@ class PortfolioEntryResourceIT {
         assertThat(testPortfolioEntry.getGroup4()).isEqualTo(UPDATED_GROUP_4);
 
         // Validate the PortfolioEntry in Elasticsearch
-        verify(mockPortfolioEntrySearchRepository).save(testPortfolioEntry);
+//        verify(mockPortfolioEntrySearchRepository).save(testPortfolioEntry);
     }
 
     @Test
@@ -379,7 +379,7 @@ class PortfolioEntryResourceIT {
         assertThat(portfolioEntryList).hasSize(databaseSizeBeforeUpdate);
 
         // Validate the PortfolioEntry in Elasticsearch
-        verify(mockPortfolioEntrySearchRepository, times(0)).save(portfolioEntry);
+//        verify(mockPortfolioEntrySearchRepository, times(0)).save(portfolioEntry);
     }
 
 

@@ -7,7 +7,7 @@
         "createLabel": "Create a new Asset",
         "createOrEditLabel": "Create or edit a Asset",
         "search": "Search for Asset",
-        "notFound": "No Assets found"
+        "notFound": "No Assets found :("
       },
       "created": "A new Asset is created with identifier {{ param }}",
       "updated": "A Asset is updated with identifier {{ param }}",
@@ -24,7 +24,12 @@
       "assetType": "Asset Type",
       "symbol": "Symbol",
       "source": "Source",
-      "portfolioEntry": "Portfolio Entry"
+      "portfolioEntry": "Asset",
+      "region": "Region",
+      "type": "Type"
+    },
+    "symbol": {
+      "search": "Search asset"
     }
   }
 }

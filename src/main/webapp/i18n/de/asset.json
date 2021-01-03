@@ -7,7 +7,7 @@
         "createLabel": "Asset erstellen",
         "createOrEditLabel": "Asset erstellen oder bearbeiten",
         "search": "Suche nach Asset",
-        "notFound": "No Assets found"
+        "notFound": "Nichts gefunden :("
       },
       "created": "Asset erstellt mit ID {{ param }}",
       "updated": "Asset aktualisiert mit ID {{ param }}",
@@ -20,11 +20,16 @@
       },
       "id": "ID",
       "name": "Name",
-      "currency": "Currency",
-      "assetType": "Asset Type",
+      "currency": "Währung",
+      "assetType": "Typ",
       "symbol": "Symbol",
-      "source": "Source",
-      "portfolioEntry": "Portfolio Entry"
+      "source": "Quelle",
+      "portfolioEntry": "Vermögenswert",
+      "region": "Region",
+      "type": "Typ"
+    },
+    "symbol": {
+      "search": "Vermögenswerte suchen"
     }
   }
 }

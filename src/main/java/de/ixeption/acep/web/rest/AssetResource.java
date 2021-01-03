@@ -195,6 +195,7 @@ public class AssetResource {
      * @return the result of the search.
      */
     @GetMapping("/_search/assets")
+    @PreAuthorize("hasAuthority(T(de.ixeption.acep.security.Role).ROLE_USER.name())")
     public List<Asset> searchAssets(@RequestParam String query) {
         log.debug("REST request to search Assets for query {}", query);
         return StreamSupport
