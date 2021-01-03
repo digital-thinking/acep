@@ -1,8 +1,13 @@
 import Component from 'vue-class-component';
 import {Inject, Vue} from 'vue-property-decorator';
 import LoginService from '@/account/login.service';
+import PortfolioDashboard from "@/views/portfolio/portfolio-dashboard.vue";
 
-@Component
+@Component({
+  components: {
+    "PortfolioDashboard": PortfolioDashboard
+  }
+})
 export default class Home extends Vue {
   @Inject('loginService')
   private loginService: () => LoginService;

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="startWebDevDebugging" type="CompoundRunConfigurationType">
-        <toRun name="startDebug" type="GradleRunConfiguration"/>
+    <configuration default="false" name="runServerDevelopment" type="CompoundRunConfigurationType">
         <toRun name="startDebug" type="js.build_tools.npm"/>
+        <toRun name="startDebug" type="GradleRunConfiguration"/>
         <method v="2"/>
     </configuration>
 </component>

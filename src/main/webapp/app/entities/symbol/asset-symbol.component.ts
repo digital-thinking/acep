@@ -13,12 +13,14 @@ export default class AssetSymbolSearch extends Vue {
   public isFetching: boolean = false;
   public addId: number = null;
   @Inject('assetSymbolService') private assetSymbolService: () => AssetSymbolService;
+  private searched: boolean = false;
 
   public search(query): void {
     this.isFetching = true;
     if (!query) {
       this.symbols = [];
     }
+    this.searched = true;
     this.currentSearch = query;
     this.assetSymbolService().querySymbols(query).then(res => {
       this.symbols = res;

@@ -19,7 +19,7 @@
             </div>
         </div>
         <br/>
-        <div v-if="!isFetching && symbols && symbols.length === 0" class="alert alert-warning">
+        <div v-if="searched && symbols && symbols.length === 0" class="alert alert-warning">
             <span v-text="$t('acepApp.asset.home.notFound')">No assets found</span>
         </div>
         <div v-if="symbols && symbols.length > 0" class="table-responsive">
