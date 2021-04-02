@@ -45,7 +45,7 @@ export default class Portfolio extends Vue {
       return;
     }
     this.portfolioService().retrieve().then(res => {
-      this.portfolios = res.data;
+      this.portfolios = res;
       this.isFetching = false;
     }, err => {
       this.isFetching = false;

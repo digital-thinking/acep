@@ -1,9 +1,11 @@
 package de.ixeption.acep.web.rest;
 
-import de.ixeption.acep.domain.Portfolio;
 import de.ixeption.acep.domain.User;
+import de.ixeption.acep.domain.portfolio.Portfolio;
+import de.ixeption.acep.domain.portfolio.PortfolioDTO;
 import de.ixeption.acep.repository.PortfolioRepository;
 import de.ixeption.acep.repository.search.PortfolioSearchRepository;
+import de.ixeption.acep.service.portfolio.PortfolioCalculationService;
 import de.ixeption.acep.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,7 +29,7 @@ import java.util.stream.StreamSupport;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 /**
- * REST controller for managing {@link de.ixeption.acep.domain.Portfolio}.
+ * REST controller for managing {@link Portfolio}.
  */
 @RestController
 @RequestMapping("/api")
@@ -37,12 +40,15 @@ public class PortfolioResource extends AbstractResource {
     private final Logger log = LoggerFactory.getLogger(PortfolioResource.class);
     private final PortfolioRepository portfolioRepository;
     private final PortfolioSearchRepository portfolioSearchRepository;
+    private final PortfolioCalculationService portfolioCalculationService;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    public PortfolioResource(PortfolioRepository portfolioRepository, PortfolioSearchRepository portfolioSearchRepository) {
+    public PortfolioResource(PortfolioRepository portfolioRepository, PortfolioSearchRepository portfolioSearchRepository,
+                             PortfolioCalculationService portfolioCalculationService) {
         this.portfolioRepository = portfolioRepository;
         this.portfolioSearchRepository = portfolioSearchRepository;
+        this.portfolioCalculationService = portfolioCalculationService;
     }
 
     /**
@@ -151,6 +157,31 @@ public class PortfolioResource extends AbstractResource {
             return portfolioRepository.findAllByUserId(loggedInUser.getId());
         }
     }
+
+    /**
+     * {@code GET  /portfolios} : get all the portfolios.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of portfolios in body.
+     */
+    @GetMapping("/portfolios/dtos")
+    public List<PortfolioDTO> getAllPortfolioDtos() {
+        log.debug("REST request to get all Portfolios");
+        User loggedInUser = getLoggedInUser();
+        List<Portfolio> allByUserId = portfolioRepository.findAllByUserId(loggedInUser.getId());
+        List<PortfolioDTO> portfolioDTOs = new ArrayList<>();
+        for (Portfolio portfolio :
+            allByUserId) {
+            PortfolioDTO portfolioDTO = new PortfolioDTO();
+            portfolioDTO.setPortfolio(portfolio);
+            portfolioDTO.setPortfoliosNumbers(portfolioCalculationService.calculatePortfolioNumbers(portfolio));
+            portfolioDTOs.add(portfolioDTO);
+        }
+
+        return portfolioDTOs;
+
+
+    }
+
 
     /**
      * {@code GET  /portfolios/:id} : get the "id" portfolio.

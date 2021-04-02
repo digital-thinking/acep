@@ -1,7 +1,7 @@
 package de.ixeption.acep.web.rest;
 
 import de.ixeption.acep.IntegrationTest;
-import de.ixeption.acep.domain.Portfolio;
+import de.ixeption.acep.domain.portfolio.Portfolio;
 import de.ixeption.acep.repository.PortfolioRepository;
 import de.ixeption.acep.repository.search.PortfolioSearchRepository;
 import org.junit.jupiter.api.BeforeEach;

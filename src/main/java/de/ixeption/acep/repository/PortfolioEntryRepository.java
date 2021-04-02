@@ -1,6 +1,6 @@
 package de.ixeption.acep.repository;
 
-import de.ixeption.acep.domain.PortfolioEntry;
+import de.ixeption.acep.domain.portfolio.PortfolioEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

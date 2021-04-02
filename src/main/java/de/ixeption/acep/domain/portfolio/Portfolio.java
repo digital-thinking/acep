@@ -1,7 +1,8 @@
-package de.ixeption.acep.domain;
+package de.ixeption.acep.domain.portfolio;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.ixeption.acep.domain.User;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
@@ -45,6 +46,8 @@ public class Portfolio implements Serializable {
     @CreationTimestamp
     private LocalDateTime created;
 
+    //TODO mal da mal nicht, je nach dem ob man vorher den getter aufgerufen hat
+    // portfoliosDTO fehler im vue js
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.REMOVE)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = {

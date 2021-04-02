@@ -1,13 +1,14 @@
 import axios from 'axios';
 
-import {IPortfolio} from '@/shared/model/portfolio.model';
+import {IPortfolio, Portfolio} from '@/shared/model/portfolio.model';
+import {PortfolioDTO} from '@/shared/dtos/portfolios-dto.model';
 
 
 const baseApiUrl = 'api/portfolios';
 const baseSearchApiUrl = 'api/_search/portfolios?query=';
 
 export default class PortfolioService {
-  public search(query): Promise<any> {
+  public search(query): Promise<Portfolio[]> {
     return new Promise<any>((resolve, reject) => {
       axios.get(`${baseSearchApiUrl}${query}`).then(res => {
         resolve(res.data);
@@ -27,10 +28,10 @@ export default class PortfolioService {
     });
   }
 
-  public retrieve(): Promise<any> {
+  public retrieve(): Promise<Portfolio[]> {
     return new Promise<any>((resolve, reject) => {
       axios.get(baseApiUrl).then(res => {
-        resolve(res);
+        resolve(res.data);
       }).catch(err => {
         reject(err);
       });
@@ -66,4 +67,16 @@ export default class PortfolioService {
       });
     });
   }
+
+  public retrieveDtos(): Promise<PortfolioDTO[]> {
+    return new Promise<any>((resolve, reject) => {
+      axios.get(`${baseApiUrl}/dtos`).then(res => {
+        console.log(res.data)
+        resolve(res.data);
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  }
 }
+

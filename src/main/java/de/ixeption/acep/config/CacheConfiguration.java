@@ -1,5 +1,7 @@
 package de.ixeption.acep.config;
 
+import de.ixeption.acep.domain.portfolio.Portfolio;
+import de.ixeption.acep.domain.portfolio.PortfolioEntry;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
@@ -55,9 +57,9 @@ public class CacheConfiguration {
             createCache(cm, de.ixeption.acep.domain.User.class.getName() + ".authorities");
             createCache(cm, de.ixeption.acep.domain.PersistentToken.class.getName());
             createCache(cm, de.ixeption.acep.domain.User.class.getName() + ".persistentTokens");
-            createCache(cm, de.ixeption.acep.domain.Portfolio.class.getName());
-            createCache(cm, de.ixeption.acep.domain.Portfolio.class.getName() + ".portfolioEntries");
-            createCache(cm, de.ixeption.acep.domain.PortfolioEntry.class.getName());
+            createCache(cm, Portfolio.class.getName());
+            createCache(cm, Portfolio.class.getName() + ".portfolioEntries");
+            createCache(cm, PortfolioEntry.class.getName());
             createCache(cm, de.ixeption.acep.domain.Asset.class.getName());
             createCache(cm, de.ixeption.acep.domain.Asset.class.getName() + ".portfolioEntries");
             // jhipster-needle-ehcache-add-entry

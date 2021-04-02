@@ -1,5 +1,6 @@
 package de.ixeption.acep.domain;
 
+import de.ixeption.acep.domain.portfolio.Portfolio;
 import de.ixeption.acep.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 

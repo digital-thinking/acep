@@ -170,4 +170,4 @@ jhipster:
 # ===================================================================
 
 application:
-  alphaVantageApiKey: 'VQLAJ7OFO51RKHRL'
+  alphaVantageApiKey: 

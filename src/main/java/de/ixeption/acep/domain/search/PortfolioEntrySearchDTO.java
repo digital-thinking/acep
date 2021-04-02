@@ -1,6 +1,6 @@
 package de.ixeption.acep.domain.search;
 
-import de.ixeption.acep.domain.PortfolioEntry;
+import de.ixeption.acep.domain.portfolio.PortfolioEntry;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.Id;

@@ -1,14 +1,14 @@
 <template>
     <div>
-        <h1>Dashboard</h1>
+        <h1>Portfolios</h1>
         <ul>
             <li
                 is="PortfolioView"
-                v-for="(portfolio, index) in portfolios"
-                v-bind:key="portfolio.id"
+                v-for="(dto, index) in portfoliosDTOs"
+                v-bind:key="dto.id"
                 v-bind:index="index"
-                v-bind:portfolio="portfolio"
-                v-on:remove="portfolio.splice(index, 1)"
+                v-bind:dto="dto"
+                v-on:remove="portfoliosDTOs.splice(index, 1)"
             ></li>
         </ul>
     </div>

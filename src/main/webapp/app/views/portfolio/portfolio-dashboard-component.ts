@@ -1,7 +1,7 @@
 import {Component, Inject, Vue} from 'vue-property-decorator';
-import {IPortfolio} from "@/shared/model/portfolio.model";
 import PortfolioService from "@/entities/portfolio/portfolio.service";
 import PortfolioView from '@/views/portfolio/portfolio-view.vue'
+import {IPortfolioDTO} from "@/shared/dtos/portfolios-dto.model";
 
 @Component({
   components: {
@@ -9,7 +9,7 @@ import PortfolioView from '@/views/portfolio/portfolio-view.vue'
   }
 })
 export default class PortfolioDashboardComponent extends Vue {
-  public portfolios: IPortfolio[] = [];
+  public portfoliosDTOs: IPortfolioDTO[] = [];
   @Inject('portfolioService') private portfolioService: () => PortfolioService;
 
   public mounted(): void {
@@ -17,8 +17,8 @@ export default class PortfolioDashboardComponent extends Vue {
   }
 
   public getAll(): void {
-    this.portfolioService().retrieve().then(res => {
-      this.portfolios = res.data;
+    this.portfolioService().retrieveDtos().then(res => {
+      this.portfoliosDTOs = res;
     }, err => {
     });
   }

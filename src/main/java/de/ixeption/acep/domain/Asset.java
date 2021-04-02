@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.ixeption.acep.domain.enumeration.AssetType;
 import de.ixeption.acep.domain.enumeration.Currency;
 import de.ixeption.acep.domain.enumeration.Source;
+import de.ixeption.acep.domain.portfolio.PortfolioEntry;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Field;

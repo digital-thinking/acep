@@ -1,7 +1,7 @@
 package de.ixeption.acep.web.rest;
 
-import de.ixeption.acep.domain.PortfolioEntry;
 import de.ixeption.acep.domain.User;
+import de.ixeption.acep.domain.portfolio.PortfolioEntry;
 import de.ixeption.acep.domain.search.PortfolioEntrySearchDTO;
 import de.ixeption.acep.repository.PortfolioEntryRepository;
 import de.ixeption.acep.repository.search.PortfolioEntrySearchRepository;
@@ -27,7 +27,7 @@ import java.util.stream.StreamSupport;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 /**
- * REST controller for managing {@link de.ixeption.acep.domain.PortfolioEntry}.
+ * REST controller for managing {@link PortfolioEntry}.
  */
 @RestController
 @RequestMapping("/api")

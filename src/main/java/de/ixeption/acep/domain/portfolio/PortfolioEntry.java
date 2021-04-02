@@ -1,6 +1,7 @@
-package de.ixeption.acep.domain;
+package de.ixeption.acep.domain.portfolio;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.ixeption.acep.domain.Asset;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
